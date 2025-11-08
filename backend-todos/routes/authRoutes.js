@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/authController');
+const authMiddleware = require('../middleware/auth');
 
 /**
  * @swagger
@@ -22,18 +23,19 @@ const authController = require('../controllers/authController');
  *           schema:
  *             type: object
  *             required:
- *               - username
+ *               - email
  *               - password
  *             properties:
- *               username:
+ *               email:
  *                 type: string
+ *                 format: email
  *               password:
  *                 type: string
  *     responses:
  *       201:
  *         description: User registered successfully
  *       400:
- *         description: Username already exists
+ *         description: Email already exists
  */
 router.post('/register', authController.register);
 
@@ -50,11 +52,12 @@ router.post('/register', authController.register);
  *           schema:
  *             type: object
  *             required:
- *               - username
+ *               - email
  *               - password
  *             properties:
- *               username:
+ *               email:
  *                 type: string
+ *                 format: email
  *               password:
  *                 type: string
  *     responses:
@@ -71,5 +74,8 @@ router.post('/register', authController.register);
  *         description: Invalid credentials
  */
 router.post('/login', authController.login);
+
+router.get('/profile', authMiddleware, authController.getProfile);
+router.patch('/profile', authMiddleware, authController.updateProfile);
 
 module.exports = router;
