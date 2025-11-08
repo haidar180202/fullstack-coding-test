@@ -24,6 +24,11 @@ const todoController = require('../controllers/todoController');
  *         id: 1
  *         task: "Buy milk"
  *         completed: false
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
  */
 
 /**
@@ -39,6 +44,8 @@ const todoController = require('../controllers/todoController');
  *   get:
  *     summary: Returns the list of all the todos
  *     tags: [Todos]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: The list of the todos
@@ -48,6 +55,8 @@ const todoController = require('../controllers/todoController');
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Todo'
+ *       401:
+ *         description: Unauthorized
  */
 router.get('/', todoController.getAllTodos);
 
@@ -57,6 +66,8 @@ router.get('/', todoController.getAllTodos);
  *   post:
  *     summary: Create a new todo
  *     tags: [Todos]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -72,6 +83,8 @@ router.get('/', todoController.getAllTodos);
  *               $ref: '#/components/schemas/Todo'
  *       400:
  *         description: Bad request
+ *       401:
+ *         description: Unauthorized
  */
 router.post('/', todoController.createTodo);
 
@@ -81,6 +94,8 @@ router.post('/', todoController.createTodo);
  *   patch:
  *     summary: Update the todo by the id
  *     tags: [Todos]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -101,6 +116,8 @@ router.post('/', todoController.createTodo);
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Todo'
+ *       401:
+ *         description: Unauthorized
  *       404:
  *         description: The todo was not found
  *       500:
@@ -114,6 +131,8 @@ router.patch('/:id', todoController.updateTodo);
  *   delete:
  *     summary: Remove the todo by id
  *     tags: [Todos]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -125,6 +144,8 @@ router.patch('/:id', todoController.updateTodo);
  *     responses:
  *       204:
  *         description: The todo was deleted
+ *       401:
+ *         description: Unauthorized
  *       404:
  *         description: The todo was not found
  */
