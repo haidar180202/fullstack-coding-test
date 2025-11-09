@@ -1,27 +1,26 @@
 # Laravel API for Users and Posts
 
-This project is the solution for **Question 4 — Laravel API** of the Full Stack Developer Coding Test.
+This project is the solution for the **Optional Question 4 — Laravel API** of the Full Stack Developer Coding Test. It provides a simple, paginated REST API to serve user data.
 
-## Task Requirements
+While the original task was to simply provide a paginated list of users with their posts, this API was integrated into the main `frontend` application to power a dynamic user discovery feature.
 
-The main goal of this task is to create a simple API using Laravel with the following specifications:
+## Core Features
 
--   **Endpoint:** Create a `GET /api/users` endpoint.
--   **Response:** The endpoint must return a paginated JSON response containing a list of users.
--   **Data Relationship:** Each user object in the response must include their associated posts.
+-   **Endpoint:** A `GET /api/users` endpoint that returns a paginated JSON list of users.
+-   **Data Relationship:** Each user object includes their associated posts, demonstrating a one-to-many relationship.
 -   **Database:**
-    -   Create `User` and `Post` models.
-    -   Set up migrations for the `users` and `posts` tables.
-    -   Define a one-to-many relationship where a `User` can have many `Posts`.
-    -   Use database seeding to populate the tables with sample data.
+    -   `User` and `Post` models with corresponding migrations.
+    -   Database seeding for sample data.
 
----
+## Feature Integration: Random Profile Discovery
 
-## Features
+This API serves as the data source for the **Random Profile** feature in the Vue.js frontend. Key aspects of this integration include:
 
--   Provides a paginated list of users.
--   Includes each user's posts within the user object.
--   Offers API documentation through Swagger (L5 Swagger).
+-   **Dynamic Data Fetching**: The frontend dynamically fetches batches of users from the `/api/users` endpoint.
+-   **Engaging UI**: The user data is displayed in an interactive, Tinder-like card stack animation, allowing users to swipe through profiles.
+-   **Seamless Pagination**: The frontend automatically requests the next page of users when the current batch is exhausted, creating an infinite-scrolling experience.
+
+This integration showcases how a simple backend API can power a rich and interactive frontend user experience.
 
 ## Getting Started
 
@@ -35,8 +34,8 @@ The main goal of this task is to create a simple API using Laravel with the foll
 
 1.  **Clone the repository:**
     ```sh
-    git clone https://github.com/your-username/your-repo-name.git
-    cd your-repo-name
+    git clone <repository-url>
+    cd backend-users
     ```
 
 2.  **Install dependencies:**
@@ -75,7 +74,7 @@ To start the development server, use the following command:
 php artisan serve
 ```
 
-The application will be available at `http://127.0.0.1:8000` (or another port if 8000 is in use).
+The application will be available at `http://127.0.0.1:8000`.
 
 ## API Endpoint
 
@@ -117,11 +116,3 @@ The application will be available at `http://127.0.0.1:8000` (or another port if
         "total": 10
     }
     ```
-
-## API Documentation
-
-Swagger documentation is available for this API.
-
--   **URL:** `/api/documentation`
-
-    After starting the application, you can access the interactive documentation at `http://127.0.0.1:8000/api/documentation`.
