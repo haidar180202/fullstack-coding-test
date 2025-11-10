@@ -42,6 +42,7 @@
 
 <script setup>
 import { reactive, onMounted, ref } from 'vue';
+import apiClient from '../api';
 
 const user = reactive({
   name: '',
@@ -57,19 +58,10 @@ let debounceTimer = null;
 
 const fetchProfile = async () => {
   try {
-    const token = localStorage.getItem('token');
-    const response = await fetch('/api/auth/profile', {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    });
-    const data = await response.json();
-    if (response.ok) {
-      user.name = data.name;
-      user.email = data.email;
-      user.profilePicture = data.profilePicture;
-    }
+    const response = await apiClient.get('/auth/profile');
+    user.name = response.data.name;
+    user.email = response.data.email;
+    user.profilePicture = response.data.profilePicture;
   } catch (error) {
     console.error('Failed to fetch profile:', error);
   }
@@ -78,32 +70,20 @@ const fetchProfile = async () => {
 const saveProfile = async () => {
   saveStatus.value = 'Saving...';
   try {
-    const token = localStorage.getItem('token');
-    const response = await fetch('/api/auth/profile', {
-        method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        name: user.name,
-        email: user.email,
-        profilePicture: user.profilePicture,
-        password: user.password,
-      }),
+    await apiClient.patch('/auth/profile', {
+      name: user.name,
+      email: user.email,
+      profilePicture: user.profilePicture,
+      password: user.password,
     });
 
-    if (response.ok) {
-      setTimeout(() => {
-        saveStatus.value = 'Saved!';
-        setTimeout(() => (saveStatus.value = ''), 2000);
-      }, 500);
-    } else {
-      saveStatus.value = 'Failed to save';
-    }
+    setTimeout(() => {
+      saveStatus.value = 'Saved!';
+      setTimeout(() => (saveStatus.value = ''), 2000);
+    }, 500);
   } catch (error) {
-      saveStatus.value = 'Error';
-    }
+    saveStatus.value = 'Failed to save';
+  }
 };
 
 const onInput = (event) => {

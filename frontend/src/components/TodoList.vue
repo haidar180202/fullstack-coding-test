@@ -18,24 +18,16 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
+import apiClient from '../api';
 
 const todos = ref([]);
 const newTodoTask = ref('');
 const editingTodoId = ref(null);
 
-const API_URL = 'http://localhost:3000/api/todos';
-
 const fetchTodos = async () => {
   try {
-    const token = localStorage.getItem('token');
-    const response = await fetch(API_URL, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    });
-    if (response.ok) {
-      todos.value = await response.json();
-    }
+    const response = await apiClient.get('/todos');
+    todos.value = response.data;
   } catch (error) {
     console.error('Failed to fetch todos:', error);
   }
@@ -44,20 +36,12 @@ const fetchTodos = async () => {
 const addTodo = async () => {
   if (!newTodoTask.value.trim()) return;
   try {
-    const token = localStorage.getItem('token');
-    const response = await fetch(API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify({ task: newTodoTask.value, completed: false }),
+    const response = await apiClient.post('/todos', {
+      task: newTodoTask.value,
+      completed: false,
     });
-    if (response.ok) {
-      const newTodo = await response.json();
-      todos.value.push(newTodo);
-      newTodoTask.value = '';
-    }
+    todos.value.push(response.data);
+    newTodoTask.value = '';
   } catch (error) {
     console.error('Failed to add todo:', error);
   }
@@ -70,21 +54,12 @@ const editTodo = (todo) => {
 const updateTodo = async (todo) => {
   editingTodoId.value = null;
   try {
-    const token = localStorage.getItem('token');
-    const response = await fetch(`${API_URL}/${todo.id}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify({ task: todo.task }),
+    const response = await apiClient.patch(`/todos/${todo.id}`, {
+      task: todo.task,
     });
-    if (response.ok) {
-      const updatedTodo = await response.json();
-      const index = todos.value.findIndex(t => t.id === todo.id);
-      if (index !== -1) {
-        todos.value[index] = updatedTodo;
-      }
+    const index = todos.value.findIndex(t => t.id === todo.id);
+    if (index !== -1) {
+      todos.value[index] = response.data;
     }
   } catch (error) {
     console.error('Failed to update todo:', error);
@@ -93,21 +68,12 @@ const updateTodo = async (todo) => {
 
 const toggleTodoCompletion = async (todo) => {
   try {
-    const token = localStorage.getItem('token');
-    const response = await fetch(`${API_URL}/${todo.id}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify({ completed: !todo.completed }),
+    const response = await apiClient.patch(`/todos/${todo.id}`, {
+      completed: !todo.completed,
     });
-    if (response.ok) {
-      const updatedTodo = await response.json();
-      const index = todos.value.findIndex(t => t.id === todo.id);
-      if (index !== -1) {
-        todos.value[index] = updatedTodo;
-      }
+    const index = todos.value.findIndex(t => t.id === todo.id);
+    if (index !== -1) {
+      todos.value[index] = response.data;
     }
   } catch (error) {
     console.error('Failed to update todo:', error);
@@ -116,16 +82,8 @@ const toggleTodoCompletion = async (todo) => {
 
 const deleteTodo = async (id) => {
   try {
-    const token = localStorage.getItem('token');
-    const response = await fetch(`${API_URL}/${id}`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    });
-    if (response.ok) {
-      todos.value = todos.value.filter(todo => todo.id !== id);
-    }
+    await apiClient.delete(`/todos/${id}`);
+    todos.value = todos.value.filter(todo => todo.id !== id);
   } catch (error) {
     console.error('Failed to delete todo:', error);
   }
