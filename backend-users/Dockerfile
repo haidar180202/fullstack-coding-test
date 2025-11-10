@@ -50,6 +50,8 @@ RUN chmod -R 775 storage bootstrap/cache
 # Clear caches
 RUN php artisan config:clear
 RUN php artisan route:clear
+RUN php artisan view:clear
+RUN php artisan cache:clear
 
 # Expose port 9000 and start php-fpm server
 EXPOSE 9000
