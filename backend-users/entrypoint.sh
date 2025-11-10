@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-composer install --no-interaction --optimize-autoloader --no-dev
+composer install --no-interaction --optimize-autoloader 
 
 # Wait for the database to be ready
 # This is a simple loop, a more robust solution might use docker-compose depends_on with healthchecks
