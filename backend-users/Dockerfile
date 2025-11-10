@@ -18,7 +18,8 @@ RUN apt-get update && apt-get install -y \
     git \
     curl \
     libonig-dev \
-    libzip-dev
+    libzip-dev \
+    libfcgi-bin
 
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -51,4 +52,17 @@ RUN php artisan route:clear
 
 # Expose port 9000 and start php-fpm server
 EXPOSE 9000
+
+# Copy entrypoint script
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Copy custom PHP-FPM config
+COPY www.conf /usr/local/etc/php-fpm.d/www.conf
+
+# Add healthcheck script
+COPY php-fpm-healthcheck /usr/local/bin/php-fpm-healthcheck
+RUN chmod +x /usr/local/bin/php-fpm-healthcheck
+
+ENTRYPOINT ["entrypoint.sh"]
 CMD ["php-fpm"]
