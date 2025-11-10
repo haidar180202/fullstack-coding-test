@@ -1,0 +1,75 @@
+services:
+  # Frontend Service (Vue.js with Nginx)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_TODOS_API_URL: /api
+        VITE_USERS_API_URL: http://nginx-laravel:80
+    container_name: frontend
+    ports:
+      - "5173:80"
+    volumes:
+      - ./nginx/frontend.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - app-network
+
+  # Backend Todos Service (Node.js/Express)
+  backend-todos:
+    build:
+      context: ./backend-todos
+      dockerfile: Dockerfile
+    container_name: backend-todos
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network
+
+  # Backend Users Service (Laravel/PHP-FPM)
+  backend-users:
+    build:
+      context: ./backend-users
+      dockerfile: Dockerfile
+    container_name: backend-users
+    volumes:
+      - ./backend-users:/var/www
+    networks:
+      - app-network
+
+  # Nginx for Laravel
+  nginx-laravel:
+    image: nginx:alpine
+    container_name: nginx-laravel
+    ports:
+      - "8000:80"
+    volumes:
+      - ./backend-users:/var/www
+      - ./nginx/laravel.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - backend-users
+    networks:
+      - app-network
+
+  # MySQL Database
+  db:
+    image: mysql:8.0
+    container_name: mysql-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: laravel_db
+      MYSQL_USER: laravel_user
+      MYSQL_PASSWORD: laravel_password
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  db-data:
+    driver: local
